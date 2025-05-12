@@ -1,6 +1,6 @@
 # social_app
 
-A new Flutter project.
+using flutter 3.27.0
 
 ## Getting Started
 
