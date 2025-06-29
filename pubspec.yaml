@@ -24,6 +24,8 @@ dependencies:
   like_button: ^2.0.5
   image_picker: ^1.0.4
   jitsi_meet_wrapper: ^0.2.0+1
+  quick_quiz:
+    path: quick_quiz
 
 dev_dependencies:
   flutter_test:

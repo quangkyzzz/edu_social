@@ -1,3 +1,4 @@
+import 'package:quick_quiz/quick_quiz.dart';
 import 'package:social_app/common/common.dart';
 import 'package:social_app/features/home/test_detail.dart';
 import 'package:social_app/theme/pallete.dart';
@@ -16,47 +17,36 @@ class TestView extends ConsumerStatefulWidget {
 }
 
 class _TestViewState extends ConsumerState<TestView> {
+  final quiz = Quiz(
+    questions: [
+      QuestionModel(
+        question: 'How is acceleration related to mass and force according to Newton\'s second law of motion?',
+        options: [
+          'Acceleration is directly proportional to mass and inversely proportional to force',
+          'Acceleration is directly proportional to force and mass',
+          'Acceleration is inversely proportional to mass and force',
+          'Acceleration is inversely proportional to force and directly proportional to mass'
+        ],
+        correctAnswerIndex: 0,
+      ),
+      QuestionModel(
+        question: 'What is the largest planet in our solar system?',
+        options: ['Earth', 'Jupiter', 'Mars', 'Saturn'],
+        correctAnswerIndex: 1,
+      ),
+      QuestionModel(
+        question: 'Which animal is known as the "King of the Jungle"?',
+        options: ['Tiger', 'Lion', 'Elephant', 'Bear'],
+        correctAnswerIndex: 1,
+      ),
+    ],
+    timerDuration: 30,
+  );
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: UIConstants.appBar(),
-      body: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.only(top: 5),
-            width: double.infinity,
-            height: 100,
-            decoration: BoxDecoration(
-              color: Pallete.backgroundGreyColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const NewWidget(
-              avatar: 'https://i.imgur.com/CbhBdjn.png',
-              name: 'Test 1',
-              text1: 'week 1 test',
-              text2: 'By: @quangzzz',
-            ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Container(
-            padding: const EdgeInsets.only(top: 5),
-            width: double.infinity,
-            height: 100,
-            decoration: BoxDecoration(
-              color: Pallete.backgroundGreyColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const NewWidget(
-              avatar: 'https://i.imgur.com/Axkr3cE.jpg',
-              name: 'Test 2',
-              text1: 'week 2 test',
-              text2: 'By: @testmail',
-            ),
-          )
-        ],
-      ),
+      body: QuizPage(quiz: quiz),
     );
   }
 }
