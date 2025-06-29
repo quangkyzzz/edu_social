@@ -1,11 +1,10 @@
 name: quick_quiz
 description: "Package to display multiple-choice-questions (MCQs) in a quiz format."
 version: 1.0.0
-author: Kiran Poudel
 homepage:
 
 environment:
-  sdk: '>=3.4.4 <4.0.0'
+  sdk: ">=3.4.4 <4.0.0"
   flutter: ">=1.17.0"
 
 dependencies:

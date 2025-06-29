@@ -1,4 +1,5 @@
 import 'package:social_app/constants/constants.dart';
+import 'package:social_app/features/home/exam_feature/exam_view.dart';
 import 'package:social_app/features/home/group_view.dart';
 import 'package:social_app/features/home/test_view.dart';
 import 'package:social_app/features/meeting/view/meeting_view.dart';
@@ -69,7 +70,7 @@ class SideDrawer extends ConsumerWidget {
                 color: Pallete.whiteColor,
               ),
               title: const Text(
-                'Test',
+                'Exam',
                 style: TextStyle(
                   fontSize: 22,
                 ),
@@ -77,7 +78,7 @@ class SideDrawer extends ConsumerWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  TestView.route(),
+                  ExamView.route(),
                 );
               },
             ),

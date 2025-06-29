@@ -13,10 +13,7 @@ class QuizPage extends StatefulWidget {
   final Color primaryColor;
 
   /// Constructor
-  const QuizPage(
-      {super.key,
-      required this.quiz,
-      this.primaryColor = const Color(0xffDA3732)});
+  const QuizPage({super.key, required this.quiz, this.primaryColor = const Color(0xffDA3732)});
 
   @override
   _QuizPageState createState() => _QuizPageState();
@@ -142,7 +139,7 @@ class _QuizPageState extends State<QuizPage> {
                   },
                   child: const Text(
                     'Skip',
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                    style: TextStyle(color: Colors.red, fontSize: 12),
                   ),
                 ),
               ],
@@ -164,7 +161,7 @@ class _QuizPageState extends State<QuizPage> {
             const SizedBox(height: 20),
             Text(
               currentQuestion.question,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
             ),
             const SizedBox(height: 20),
             Expanded(

@@ -60,17 +60,12 @@ class _ScoreState extends State<Score> {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    "Quiz Summary",
+                    "Summary",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
-                      shadows: [
-                        Shadow(
-                            color: Colors.black38,
-                            offset: Offset(2, 2),
-                            blurRadius: 4)
-                      ],
+                      shadows: [Shadow(color: Colors.black38, offset: Offset(2, 2), blurRadius: 4)],
                     ),
                   ),
                   const SizedBox(height: 50),
@@ -79,8 +74,7 @@ class _ScoreState extends State<Score> {
                     children: [
                       CustomPaint(
                         size: const Size(150, 150),
-                        painter:
-                            ScoreIndicator(accuracy: widget.quiz.totalAccuracy),
+                        painter: ScoreIndicator(accuracy: widget.quiz.totalAccuracy),
                       ),
                       Column(
                         children: [
@@ -90,12 +84,7 @@ class _ScoreState extends State<Score> {
                               fontSize: 36,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
-                              shadows: [
-                                Shadow(
-                                    color: Colors.black54,
-                                    offset: Offset(2, 2),
-                                    blurRadius: 5)
-                              ],
+                              shadows: [Shadow(color: Colors.black54, offset: Offset(2, 2), blurRadius: 5)],
                             ),
                           ),
                           Text(
@@ -124,10 +113,7 @@ class _ScoreState extends State<Score> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      ScoreLabel(
-                          icon: Icons.bar_chart,
-                          label: "Accuracy",
-                          value: "${widget.quiz.totalAccuracy}%"),
+                      ScoreLabel(icon: Icons.bar_chart, label: "Accuracy", value: "${widget.quiz.totalAccuracy}%"),
                       ScoreLabel(
                         icon: Icons.timer,
                         label: "Duration",
@@ -139,14 +125,8 @@ class _ScoreState extends State<Score> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      ScoreLabel(
-                          icon: Icons.remove_circle_outline,
-                          label: "Skipped",
-                          value: "${widget.quiz.totalSkippedQuestions}"),
-                      ScoreLabel(
-                          icon: Icons.cancel,
-                          label: "Incorrect",
-                          value: "${widget.quiz.totalIncorrectAnswers}"),
+                      ScoreLabel(icon: Icons.remove_circle_outline, label: "Skipped", value: "${widget.quiz.totalSkippedQuestions}"),
+                      ScoreLabel(icon: Icons.cancel, label: "Incorrect", value: "${widget.quiz.totalIncorrectAnswers}"),
                     ],
                   ),
                   const Spacer(),
@@ -155,13 +135,13 @@ class _ScoreState extends State<Score> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        ActionButton(
-                            icon: Icons.refresh,
-                            label: "Retry Quiz",
-                            onPressed: () {
-                              widget.onRetry();
-                              Navigator.pop(context);
-                            }),
+                        // ActionButton(
+                        //     icon: Icons.refresh,
+                        //     label: "Retry Quiz",
+                        //     onPressed: () {
+                        //       widget.onRetry();
+                        //       Navigator.pop(context);
+                        //     }),
                         ActionButton(
                             icon: Icons.check,
                             label: "Review Answer",
@@ -169,8 +149,7 @@ class _ScoreState extends State<Score> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      ReviewAnswer(quiz: widget.quiz),
+                                  builder: (context) => ReviewAnswer(quiz: widget.quiz),
                                 ),
                               );
                             }),
@@ -178,8 +157,7 @@ class _ScoreState extends State<Score> {
                             icon: Icons.home,
                             label: "Home",
                             onPressed: () {
-                              Navigator.of(context)
-                                  .popUntil((route) => route.isFirst);
+                              Navigator.of(context).popUntil((route) => route.isFirst);
                             }),
                       ],
                     ),

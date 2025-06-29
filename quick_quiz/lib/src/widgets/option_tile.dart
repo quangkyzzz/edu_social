@@ -37,7 +37,7 @@ class OptionTile extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(8.0),
           border: Border.all(
-            color: isSelected ? primaryColor : Colors.grey[300]!,
+            color: isSelected ? primaryColor : Colors.grey,
             width: 1.0,
           ),
         ),
@@ -49,25 +49,24 @@ class OptionTile extends StatelessWidget {
                 color: isSelected ? primaryColor : const Color(0xffF7F7F7),
                 borderRadius: BorderRadius.circular(8.0),
                 border: Border.all(
-                  color: isSelected ? primaryColor : Colors.grey[300]!,
+                  color: isSelected ? primaryColor : Colors.grey,
                   width: 1.0,
                 ),
               ),
-              padding:
-                  const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+              padding: const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
               margin: const EdgeInsets.only(right: 10),
               child: Text(
                 serialNumber,
-                style: TextStyle(
-                    fontSize: 12,
-                    color: isSelected ? Colors.white : Colors.black),
+                style: TextStyle(fontSize: 12, color: isSelected ? Colors.white : Colors.black),
               ),
             ),
             Expanded(
-              child: Text(optionText,
-                  style: const TextStyle(fontSize: 15),
-                  maxLines: null,
-                  overflow: TextOverflow.visible),
+              child: Text(
+                optionText,
+                style: const TextStyle(color: Colors.black, fontSize: 15),
+                maxLines: null,
+                overflow: TextOverflow.visible,
+              ),
             ),
           ],
         ),
