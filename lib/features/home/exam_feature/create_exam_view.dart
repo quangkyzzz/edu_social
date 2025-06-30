@@ -23,6 +23,10 @@ class CreateExamViewState extends ConsumerState<CreateExamView> {
     Question(options: ['', '', '', ''])
   ];
 
+  int hours = 0;
+  int minutes = 30; // Default to 30 minutes
+  int seconds = 0;
+
   @override
   Widget build(BuildContext context) {
     final currentUser = ref.read(currentUserDetailProvider).value;
@@ -51,6 +55,67 @@ class CreateExamViewState extends ConsumerState<CreateExamView> {
                   }
                   return null;
                 },
+              ),
+              Text(
+                'Exam Duration',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  // Hours
+                  Expanded(
+                    child: TextFormField(
+                      maxLength: 2,
+                      keyboardType: TextInputType.numberWithOptions(),
+                      decoration: InputDecoration(
+                        labelText: 'Hours',
+                        border: OutlineInputBorder(),
+                        counterText: '',
+                      ),
+                      initialValue: '0',
+                      onChanged: (value) {
+                        hours = int.tryParse(value) ?? 0;
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 10),
+
+                  // Minutes
+                  Expanded(
+                    child: TextFormField(
+                      maxLength: 2,
+                      keyboardType: TextInputType.numberWithOptions(),
+                      decoration: InputDecoration(
+                        labelText: 'Minutes',
+                        border: OutlineInputBorder(),
+                        counterText: '',
+                      ),
+                      initialValue: '30',
+                      onChanged: (value) {
+                        minutes = int.tryParse(value) ?? 0;
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 10),
+
+                  // Seconds
+                  Expanded(
+                    child: TextFormField(
+                      maxLength: 2,
+                      keyboardType: TextInputType.numberWithOptions(),
+                      decoration: InputDecoration(
+                        labelText: 'Seconds',
+                        border: OutlineInputBorder(),
+                        counterText: '',
+                      ),
+                      initialValue: '0',
+                      onChanged: (value) {
+                        seconds = int.tryParse(value) ?? 0;
+                      },
+                    ),
+                  ),
+                ],
               ),
               SizedBox(height: 20),
               Text(
@@ -198,6 +263,7 @@ class CreateExamViewState extends ConsumerState<CreateExamView> {
       memberID: ['12', '13', '14'],
       questions: questions,
       createAt: DateTime.now().millisecondsSinceEpoch,
+      duration: Duration(hours: hours, minutes: minutes, seconds: seconds),
     );
     ExamApi().addNewExam(exam: exam);
 

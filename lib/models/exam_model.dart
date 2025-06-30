@@ -5,12 +5,14 @@ class ExamModel {
   List<String> memberID;
   List<Question> questions;
   int createAt;
+  Duration duration;
   ExamModel({
     required this.examName,
     required this.authorID,
     required this.memberID,
     required this.questions,
     required this.createAt,
+    required this.duration,
   });
   Map<String, dynamic> toMap() {
     final result = <String, dynamic>{};
@@ -18,6 +20,7 @@ class ExamModel {
     result.addAll({'authorID': authorID});
     result.addAll({'memberID': memberID});
     result.addAll({'createAt': createAt});
+    result.addAll({'duration': duration.inMilliseconds});
     if (questions.isNotEmpty) {
       result['questions'] = questions.map((ques) => ques.toMap()).toList();
     }
@@ -35,6 +38,7 @@ class ExamModel {
       examName: map['examName'] ?? '',
       authorID: map['authorID'] ?? '',
       memberID: List<String>.from(map['memberID'] ?? {}),
+      duration: Duration(milliseconds: map['duration'] ?? 300000),
       createAt: map['createAt'],
       questions: tempQuestion,
     );

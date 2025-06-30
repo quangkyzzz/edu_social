@@ -44,13 +44,21 @@ class _GetExamViewState extends State<GetExamView> {
                   child: ExamWidget(
                     name: _watchProvider().exams[index].examName,
                     exam: _readProvider().exams[index],
-                    text1: 'text1',
-                    text2: 'text2',
+                    text1: ' ${_readProvider().exams[index].questions.length} questions',
+                    text2: 'Duration: ${_printDuration(_readProvider().exams[index].duration)}',
                   ),
                 );
               },
             ),
     );
+  }
+
+  String _printDuration(Duration duration) {
+    String negativeSign = duration.isNegative ? '-' : '';
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60).abs());
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60).abs());
+    return "$negativeSign${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
 
   GetExamProvider _readProvider() {
@@ -78,7 +86,7 @@ class ExamWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Quiz quiz = Quiz(
-      timerDuration: 120,
+      timerDuration: exam.duration.inSeconds,
       questions: [
         ...exam.questions.map((question) {
           return QuestionModel(
@@ -113,6 +121,13 @@ class ExamWidget extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             text1,
+            style: const TextStyle(
+              color: Pallete.whiteColor,
+              fontSize: 16,
+            ),
+          ),
+          Text(
+            text2,
             style: const TextStyle(
               color: Pallete.whiteColor,
               fontSize: 16,
