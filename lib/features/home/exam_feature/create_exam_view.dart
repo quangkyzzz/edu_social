@@ -1,8 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:social_app/apis/fire_store_instance.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:social_app/apis/exam_api.dart';
+import 'package:social_app/features/auth/controller/auth_controller.dart';
+import 'package:social_app/models/exam_model.dart';
 
-class CreateExamView extends StatefulWidget {
+class CreateExamView extends ConsumerStatefulWidget {
   const CreateExamView({super.key});
 
   static route() => MaterialPageRoute(
@@ -10,17 +12,21 @@ class CreateExamView extends StatefulWidget {
       );
 
   @override
-  CreateExamViewState createState() => CreateExamViewState();
+  ConsumerState<CreateExamView> createState() => CreateExamViewState();
 }
 
-class CreateExamViewState extends State<CreateExamView> {
+class CreateExamViewState extends ConsumerState<CreateExamView> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _examNameController = TextEditingController();
 
-  List<Question> questions = [Question()];
+  List<Question> questions = [
+    Question(options: ['', '', '', ''])
+  ];
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = ref.read(currentUserDetailProvider).value;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Create Exam'),
@@ -67,7 +73,7 @@ class CreateExamViewState extends State<CreateExamView> {
                   label: Text('Add Question'),
                   onPressed: () {
                     setState(() {
-                      questions.add(Question());
+                      questions.add(Question(options: ['', '', '', '']));
                     });
                   },
                 ),
@@ -81,7 +87,7 @@ class CreateExamViewState extends State<CreateExamView> {
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       // Save the exam data
-                      _saveExam();
+                      _saveExam(userID: currentUser?.uid ?? 'unknow');
                     }
                   },
                   child: Text('Save Exam'),
@@ -180,22 +186,20 @@ class CreateExamViewState extends State<CreateExamView> {
     );
   }
 
-  void _saveExam() {
+  void _saveExam({required String userID}) {
     // Process the exam data
     final examName = _examNameController.text;
-    final examQuestions = questions.map((q) => q.toMap()).toList();
+    //final examQuestions = questions.map((q) => q.toMap()).toList();
 
-    // Here you would typically save to a database or backend
-    print({
-      'examName': examName,
-      'questions': examQuestions,
-    });
-    final user = <String, dynamic>{"first": "Ada", "last": "Lovelace", "born": 1815};
-
-    FireStoreInstance.db
-        .collection("users")
-        .add(user)
-        .then((DocumentReference doc) => print('qqq DocumentSnapshot added with ID: ${doc.id}'));
+    // final user = <String, dynamic>{"first": "Ada", "last": "Lovelace", "born": 1815};
+    ExamModel exam = ExamModel(
+      examName: examName,
+      authorID: userID,
+      memberID: ['12', '13', '14'],
+      questions: questions,
+      createAt: DateTime.now().millisecondsSinceEpoch,
+    );
+    ExamApi().addNewExam(exam: exam);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Exam saved successfully!')),
@@ -206,19 +210,5 @@ class CreateExamViewState extends State<CreateExamView> {
   void dispose() {
     _examNameController.dispose();
     super.dispose();
-  }
-}
-
-class Question {
-  String content = '';
-  List<String> options = ['', '', '', ''];
-  int correctAnswerIndex = 2;
-
-  Map<String, dynamic> toMap() {
-    return {
-      'content': content,
-      'options': options,
-      'correctAnswerIndex': correctAnswerIndex,
-    };
   }
 }

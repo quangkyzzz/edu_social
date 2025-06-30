@@ -1,6 +1,7 @@
 import 'package:quick_quiz/quick_quiz.dart';
 import 'package:social_app/common/common.dart';
 import 'package:social_app/features/home/exam_feature/create_exam_view.dart';
+import 'package:social_app/features/home/exam_feature/get_exam_view.dart';
 import 'package:social_app/features/home/test_detail.dart';
 import 'package:social_app/features/meeting/widget/meeting_button.dart';
 import 'package:social_app/theme/pallete.dart';
@@ -41,7 +42,12 @@ class _ExamViewState extends ConsumerState<ExamView> {
                 text: 'Create a exam',
               ),
               MeetingButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    GetExamView.route(),
+                  );
+                },
                 icon: Icons.add_box_outlined,
                 text: 'Join a exam',
               ),
