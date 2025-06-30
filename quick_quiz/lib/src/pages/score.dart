@@ -125,7 +125,10 @@ class _ScoreState extends State<Score> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      ScoreLabel(icon: Icons.remove_circle_outline, label: "Skipped", value: "${widget.quiz.totalSkippedQuestions}"),
+                      ScoreLabel(
+                          icon: Icons.remove_circle_outline,
+                          label: "Skipped",
+                          value: "${widget.quiz.totalSkippedQuestions}"),
                       ScoreLabel(icon: Icons.cancel, label: "Incorrect", value: "${widget.quiz.totalIncorrectAnswers}"),
                     ],
                   ),
@@ -157,7 +160,7 @@ class _ScoreState extends State<Score> {
                             icon: Icons.home,
                             label: "Home",
                             onPressed: () {
-                              Navigator.of(context).popUntil((route) => route.isFirst);
+                              Navigator.of(context).pop();
                             }),
                       ],
                     ),

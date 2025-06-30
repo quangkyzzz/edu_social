@@ -92,7 +92,7 @@ class _QuizPageState extends State<QuizPage> {
   /// Navigates to score page
   void navigateToScore() {
     _timer.cancel();
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (context) => Score(

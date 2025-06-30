@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quick_quiz/quick_quiz.dart';
 
 import 'package:social_app/common/common.dart';
+import 'package:social_app/features/home/exam_feature/exam_detail.dart';
+import 'package:social_app/models/exam_model.dart';
 
 import 'package:social_app/provider/get_exam_provider.dart';
 import 'package:social_app/theme/pallete.dart';
@@ -30,14 +33,20 @@ class _GetExamViewState extends State<GetExamView> {
       appBar: UIConstants.appBar(),
       body: context.watch<GetExamProvider>().isLoading
           ? Center(child: CircularProgressIndicator())
-          : ListView.builder(
+          : ListView.separated(
+              separatorBuilder: (context, index) {
+                return const SizedBox(height: 4);
+              },
               itemCount: context.read<GetExamProvider>().exams.length,
               itemBuilder: (context, index) {
-                return ExamWidget(
-                  avatar: 'https://i.imgur.com/CbhBdjn.png',
-                  name: _watchProvider().exams[index].examName,
-                  text1: 'text1',
-                  text2: 'text2',
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: ExamWidget(
+                    name: _watchProvider().exams[index].examName,
+                    exam: _readProvider().exams[index],
+                    text1: 'text1',
+                    text2: 'text2',
+                  ),
                 );
               },
             ),
@@ -54,22 +63,43 @@ class _GetExamViewState extends State<GetExamView> {
 }
 
 class ExamWidget extends StatelessWidget {
-  final String avatar;
+  final ExamModel exam;
   final String name;
   final String text1;
   final String text2;
   const ExamWidget({
     super.key,
-    required this.avatar,
     required this.name,
     required this.text1,
     required this.text2,
+    required this.exam,
   });
 
   @override
   Widget build(BuildContext context) {
+    Quiz quiz = Quiz(
+      timerDuration: 120,
+      questions: [
+        ...exam.questions.map((question) {
+          return QuestionModel(
+            question: question.content,
+            options: question.options,
+            correctAnswerIndex: question.correctAnswerIndex,
+          );
+        })
+      ],
+    );
     return ListTile(
-      onTap: () {},
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      tileColor: Colors.grey[900],
+      enableFeedback: true,
+      onTap: () {
+        Navigator.push(
+          context,
+          ExamDetail.route(quiz),
+        );
+      },
+      leading: Icon(Icons.assignment, size: 46),
       title: Text(
         name,
         style: const TextStyle(
@@ -86,12 +116,6 @@ class ExamWidget extends StatelessWidget {
             style: const TextStyle(
               color: Pallete.whiteColor,
               fontSize: 16,
-            ),
-          ),
-          Text(
-            text2,
-            style: const TextStyle(
-              fontSize: 15,
             ),
           ),
         ],

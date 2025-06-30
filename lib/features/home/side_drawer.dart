@@ -1,7 +1,6 @@
 import 'package:social_app/constants/constants.dart';
 import 'package:social_app/features/home/exam_feature/exam_view.dart';
 import 'package:social_app/features/home/group_view.dart';
-import 'package:social_app/features/home/test_view.dart';
 import 'package:social_app/features/meeting/view/meeting_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
