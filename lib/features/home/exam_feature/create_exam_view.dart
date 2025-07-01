@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/apis/exam_api.dart';
+import 'package:social_app/common/loading_view.dart';
 import 'package:social_app/features/auth/controller/auth_controller.dart';
+import 'package:social_app/features/explore/controller/explore_controller.dart';
 import 'package:social_app/models/exam_model.dart';
+import 'package:social_app/models/user_model.dart';
 
 class CreateExamView extends ConsumerStatefulWidget {
   const CreateExamView({super.key});
@@ -16,8 +19,11 @@ class CreateExamView extends ConsumerStatefulWidget {
 }
 
 class CreateExamViewState extends ConsumerState<CreateExamView> {
+  List<UserModel> followingUserList = [];
+  String currentExamId = '';
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _examNameController = TextEditingController();
+  final TextEditingController _studentSearchController = TextEditingController();
 
   List<Question> questions = [
     Question(options: ['', '', '', ''])
@@ -27,11 +33,22 @@ class CreateExamViewState extends ConsumerState<CreateExamView> {
   int minutes = 30; // Default to 30 minutes
   int seconds = 0;
 
+  List<String> selectedStudentIds = [];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentUser = ref.read(currentUserDetailProvider).value;
-
+    if (currentUser == null) {
+      return const LoadingPage();
+    }
+    followingUserList = ref.watch(getFollowingUserProvider(currentUser.following)).value ?? [];
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text('Create Exam'),
       ),
@@ -56,6 +73,8 @@ class CreateExamViewState extends ConsumerState<CreateExamView> {
                   return null;
                 },
               ),
+
+              //Enter duration
               Text(
                 'Exam Duration',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -117,6 +136,36 @@ class CreateExamViewState extends ConsumerState<CreateExamView> {
                   ),
                 ],
               ),
+
+              //Add student
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  ElevatedButton.icon(
+                    icon: Icon(Icons.group),
+                    label: Row(
+                      children: [
+                        Text('Add Participants'),
+                        SizedBox(width: 10),
+                        if (selectedStudentIds.isNotEmpty)
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              selectedStudentIds.length.toString(),
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                      ],
+                    ),
+                    onPressed: _showStudentSelectionDialog,
+                  ),
+                ],
+              ),
+
               SizedBox(height: 20),
               Text(
                 'Questions',
@@ -152,7 +201,7 @@ class CreateExamViewState extends ConsumerState<CreateExamView> {
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       // Save the exam data
-                      _saveExam(userID: currentUser?.uid ?? 'unknow');
+                      _saveExam(userID: currentUser.uid);
                     }
                   },
                   child: Text('Save Exam'),
@@ -251,22 +300,172 @@ class CreateExamViewState extends ConsumerState<CreateExamView> {
     );
   }
 
-  void _saveExam({required String userID}) {
+  _showStudentSelectionDialog() {
+    // Temporary list to hold selections while in dialog
+    List<String> tempSelectedIds = List.from(selectedStudentIds);
+    List<UserModel> filteredStudents = followingUserList;
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDiaLog) {
+            return AlertDialog(
+              title: Text('Select Participants'),
+              content: Container(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Search Bar
+                    TextField(
+                      onChanged: (value) {
+                        final query = _studentSearchController.text.toLowerCase();
+                        setStateDiaLog(() {
+                          filteredStudents = followingUserList.where((student) {
+                            return student.name.toLowerCase().contains(query) ||
+                                student.email.toLowerCase().contains(query);
+                          }).toList();
+                        });
+                      },
+                      controller: _studentSearchController,
+                      decoration: InputDecoration(
+                        labelText: 'Search for Participants',
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(),
+                        suffixIcon: _studentSearchController.text.isNotEmpty
+                            ? IconButton(
+                                icon: Icon(Icons.clear),
+                                onPressed: () {
+                                  _studentSearchController.clear();
+                                  setStateDiaLog(() {
+                                    filteredStudents = followingUserList;
+                                  });
+                                  //_filterStudents();
+                                },
+                              )
+                            : null,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+
+                    // Selected Students Chips
+                    // if (tempSelectedIds.isNotEmpty) ...[
+                    //   Wrap(
+                    //     spacing: 8.0,
+                    //     children: tempSelectedIds.map((studentId) {
+                    //       final student = allStudents.firstWhere((s) => s.id == studentId);
+                    //       return Chip(
+                    //         label: Text(student.name),
+                    //         onDeleted: () {
+                    //           setStateDiaLog(() {
+                    //             tempSelectedIds.remove(studentId);
+                    //           });
+                    //         },
+                    //       );
+                    //     }).toList(),
+                    //   ),
+                    //   SizedBox(height: 16),
+                    // ],
+
+                    // Student List
+                    Container(
+                      height: (MediaQuery.of(context).viewInsets.bottom > 0) ? 180 : 400,
+                      child: Scrollbar(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: filteredStudents.length,
+                          itemBuilder: (context, index) {
+                            final student = filteredStudents[index];
+                            final isSelected = tempSelectedIds.contains(student.uid);
+
+                            return CheckboxListTile(
+                              contentPadding: EdgeInsets.symmetric(horizontal: 4),
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  CircleAvatar(
+                                    backgroundImage: NetworkImage(student.profilePic),
+                                    radius: 20,
+                                  ),
+                                  SizedBox(width: 12),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(student.name),
+                                      Text(
+                                        student.email,
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              value: isSelected,
+                              onChanged: (bool? value) {
+                                setStateDiaLog(() {
+                                  if (value == true) {
+                                    tempSelectedIds.add(student.uid);
+                                  } else {
+                                    tempSelectedIds.remove(student.uid);
+                                  }
+                                });
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ElevatedButton(
+                  child: Text('Confirm'),
+                  onPressed: () {
+                    setState(() {
+                      selectedStudentIds = tempSelectedIds;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _saveExam({required String userID}) async {
     // Process the exam data
     final examName = _examNameController.text;
-    //final examQuestions = questions.map((q) => q.toMap()).toList();
+    if (selectedStudentIds.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Your must choose at least one participant')),
+      );
+      return;
+    }
+    ;
 
-    // final user = <String, dynamic>{"first": "Ada", "last": "Lovelace", "born": 1815};
     ExamModel exam = ExamModel(
       examName: examName,
       authorID: userID,
-      memberID: ['12', '13', '14'],
+      memberID: selectedStudentIds,
       questions: questions,
       createAt: DateTime.now().millisecondsSinceEpoch,
       duration: Duration(hours: hours, minutes: minutes, seconds: seconds),
     );
-    ExamApi().addNewExam(exam: exam);
-
+    if (currentExamId.isEmpty) {
+      currentExamId = await ExamApi().addNewExam(exam: exam);
+    } else {
+      await ExamApi().updateExam(examId: currentExamId, newData: exam);
+    }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Exam saved successfully!')),
     );
@@ -275,6 +474,7 @@ class CreateExamViewState extends ConsumerState<CreateExamView> {
   @override
   void dispose() {
     _examNameController.dispose();
+    _studentSearchController.dispose();
     super.dispose();
   }
 }

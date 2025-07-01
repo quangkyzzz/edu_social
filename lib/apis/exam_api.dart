@@ -3,11 +3,9 @@ import 'package:social_app/apis/fire_store_instance.dart';
 import 'package:social_app/models/exam_model.dart';
 
 class ExamApi {
-  Future<void> addNewExam({required ExamModel exam}) async {
-    await FireStoreInstance.db
-        .collection("exam")
-        .add(exam.toMap())
-        .then((DocumentReference doc) => print('qqq DocumentSnapshot added with ID: ${doc.id}'));
+  Future<String> addNewExam({required ExamModel exam}) async {
+    DocumentReference doc = await FireStoreInstance.db.collection("exam").add(exam.toMap());
+    return doc.id;
   }
 
   Future<List<ExamModel>> getExam() async {
@@ -18,5 +16,9 @@ class ExamApi {
       }
     });
     return result;
+  }
+
+  Future<void> updateExam({required String examId, required ExamModel newData}) async {
+    await FireStoreInstance.db.collection("exam").doc(examId).set(newData.toMap());
   }
 }
