@@ -41,8 +41,7 @@ class QuizScreen extends StatelessWidget {
   final quiz = Quiz(
     questions: [
       QuestionModel(
-        question:
-            'How is acceleration related to mass and force according to Newton\'s second law of motion?',
+        question: 'How is acceleration related to mass and force according to Newton\'s second law of motion?',
         options: [
           'Acceleration is directly proportional to mass and inversely proportional to force',
           'Acceleration is directly proportional to force and mass',
@@ -70,9 +69,10 @@ class QuizScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Quiz'),
-        ),
-        body: QuizPage(quiz: quiz));
+      appBar: AppBar(
+        title: const Text('Quiz'),
+      ),
+      // body: QuizPage(quiz: quiz),
+    );
   }
 }

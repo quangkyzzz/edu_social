@@ -9,11 +9,11 @@ import 'package:quick_quiz/src/utils/utils.dart';
 class QuizPage extends StatefulWidget {
   /// Instance of quiz that holds all information
   final Quiz quiz;
-
+  final Function(List<int> listAns, int duration) onFinish;
   final Color primaryColor;
 
   /// Constructor
-  const QuizPage({super.key, required this.quiz, this.primaryColor = const Color(0xffDA3732)});
+  const QuizPage({super.key, required this.quiz, this.primaryColor = const Color(0xffDA3732), required this.onFinish});
 
   @override
   _QuizPageState createState() => _QuizPageState();
@@ -92,6 +92,7 @@ class _QuizPageState extends State<QuizPage> {
   /// Navigates to score page
   void navigateToScore() {
     _timer.cancel();
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -99,6 +100,7 @@ class _QuizPageState extends State<QuizPage> {
           quiz: widget.quiz,
           duration: (widget.quiz.timerDuration! - remainingTime),
           onRetry: resetQuiz,
+          onFinish: widget.onFinish,
         ),
       ),
     );
@@ -116,96 +118,134 @@ class _QuizPageState extends State<QuizPage> {
     }
   }
 
+  Future<bool?> _showBackDialog(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Are you sure?'),
+          content: const Text('Are you sure you want to leave this exam?'),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(textStyle: Theme.of(context).textTheme.labelLarge),
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(textStyle: Theme.of(context).textTheme.labelLarge),
+              child: const Text('Leave'),
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     QuestionModel currentQuestion = widget.quiz.questions[currentQuestionIndex];
-    return Container(
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Question ${currentQuestionIndex + 1} of ${widget.quiz.questions.length}',
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, dynamic result) async {
+        if (didPop) return;
+        final bool shouldPop = await _showBackDialog(context) ?? false;
+        if (context.mounted && shouldPop) {
+          navigateToScore();
+        }
+      },
+      child: Container(
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Question ${currentQuestionIndex + 1} of ${widget.quiz.questions.length}',
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      goToNextQuestion();
+                    },
+                    child: const Text(
+                      'Skip',
+                      style: TextStyle(color: Colors.red, fontSize: 12),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              TimerIndicator(
+                key: ValueKey(retryCount),
+                totalTime: widget.quiz.timerDuration!.toDouble(),
+                primaryColor: widget.primaryColor,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                getformatTime(remainingTime),
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: Colors.grey,
                 ),
-                InkWell(
-                  onTap: () {
-                    goToNextQuestion();
+              ),
+              const SizedBox(height: 20),
+              Text(
+                currentQuestion.question,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: currentQuestion.options.length,
+                  itemBuilder: (context, index) {
+                    return OptionTile(
+                        optionText: currentQuestion.options[index],
+                        isSelected: selectedOption == index,
+                        onTap: () {
+                          setState(() {
+                            selectedOption = index;
+                          });
+                        },
+                        serialNumber: "${index + 1}",
+                        primaryColor: widget.primaryColor);
                   },
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: selectedOption != null
+                      ? () {
+                          currentQuestion.selectedAnswerIndex = selectedOption;
+                          goToNextQuestion();
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    backgroundColor: widget.primaryColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
                   child: const Text(
-                    'Skip',
-                    style: TextStyle(color: Colors.red, fontSize: 12),
+                    'Next',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            TimerIndicator(
-              key: ValueKey(retryCount),
-              totalTime: widget.quiz.timerDuration!.toDouble(),
-              primaryColor: widget.primaryColor,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              getformatTime(remainingTime),
-              style: const TextStyle(
-                fontSize: 10,
-                color: Colors.grey,
               ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              currentQuestion.question,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: currentQuestion.options.length,
-                itemBuilder: (context, index) {
-                  return OptionTile(
-                      optionText: currentQuestion.options[index],
-                      isSelected: selectedOption == index,
-                      onTap: () {
-                        setState(() {
-                          selectedOption = index;
-                        });
-                      },
-                      serialNumber: "${index + 1}",
-                      primaryColor: widget.primaryColor);
-                },
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: selectedOption != null
-                    ? () {
-                        currentQuestion.selectedAnswerIndex = selectedOption;
-                        goToNextQuestion();
-                      }
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  backgroundColor: widget.primaryColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
-                child: const Text(
-                  'Next',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

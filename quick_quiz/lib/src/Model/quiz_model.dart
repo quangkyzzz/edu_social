@@ -17,24 +17,20 @@ class Quiz {
   /// Calculates the total number of skipped questions
   int get totalSkippedQuestions {
     return questions
-        .where((question) => question.selectedAnswerIndex == null)
+        .where((question) => ((question.selectedAnswerIndex == null) || (question.selectedAnswerIndex == -1)))
         .length;
   }
 
   /// Calculates the total number of correct answers
   int get totalCorrectAnswers {
-    return questions
-        .where((question) =>
-            question.selectedAnswerIndex == question.correctAnswerIndex)
-        .length;
+    return questions.where((question) => question.selectedAnswerIndex == question.correctAnswerIndex).length;
   }
 
   /// Calculates the total number of incorrect answers
   int get totalIncorrectAnswers {
     return questions
         .where((question) =>
-            question.selectedAnswerIndex != null &&
-            question.selectedAnswerIndex != question.correctAnswerIndex)
+            question.selectedAnswerIndex != null && question.selectedAnswerIndex != question.correctAnswerIndex)
         .length;
   }
 
@@ -58,16 +54,14 @@ class QuestionModel {
   int? selectedAnswerIndex;
 
   /// Constructor
-  QuestionModel(
-      {required this.question,
-      required this.options,
-      required this.correctAnswerIndex}) {
-        setCorrectAnswerIndex(correctAnswerIndex);
-      }
+  QuestionModel({required this.question, required this.options, required this.correctAnswerIndex}) {
+    setCorrectAnswerIndex(correctAnswerIndex);
+  }
 
-      void setCorrectAnswerIndex(int index) {
-        if (index < 0 || index >= options.length) {
-          throw ArgumentError("Correct Answer Index of question \n\"$question\"\nmust be within the range of available options.");
-        }
-      }
+  void setCorrectAnswerIndex(int index) {
+    if (index < 0 || index >= options.length) {
+      throw ArgumentError(
+          "Correct Answer Index of question \n\"$question\"\nmust be within the range of available options.");
+    }
+  }
 }

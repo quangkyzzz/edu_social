@@ -2,71 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_quiz/quick_quiz.dart';
-
-import 'package:social_app/common/common.dart';
+import 'package:social_app/common/UIConstants.dart';
+import 'package:social_app/common/loading_view.dart';
 import 'package:social_app/features/auth/controller/auth_controller.dart';
-import 'package:social_app/features/home/exam_feature/exam_detail.dart';
-import 'package:social_app/features/home/exam_feature/review_answer.dart';
-import 'package:social_app/features/home/exam_feature/score_page.dart';
 import 'package:social_app/models/exam_model.dart';
-import 'package:social_app/models/user_model.dart';
-
 import 'package:social_app/provider/get_exam_provider.dart';
-import 'package:social_app/route_observer.dart';
 import 'package:social_app/theme/pallete.dart';
 
-class GetExamView extends ConsumerStatefulWidget {
-  const GetExamView({super.key});
+class ManageExamView extends ConsumerStatefulWidget {
+  const ManageExamView({super.key});
   static route() => MaterialPageRoute(
-        builder: (context) => const GetExamView(),
+        builder: (context) => const ManageExamView(),
       );
   @override
-  ConsumerState<GetExamView> createState() => _GetExamViewState();
+  ConsumerState<ManageExamView> createState() => _ManageExamViewState();
 }
 
-class _GetExamViewState extends ConsumerState<GetExamView> implements RouteAware {
+class _ManageExamViewState extends ConsumerState<ManageExamView> {
   List<ExamModel> displayExam = [];
   @override
   void initState() {
     super.initState();
-    routeObserver.subscribe(this);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await context.read<GetExamProvider>().getExam();
     });
-  }
-
-  @override
-  void didPop() async {
-    print('qqq pop');
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Future.delayed(const Duration(milliseconds: 500));
-      await _readProvider().getExam();
-    });
-  }
-
-  @override
-  void didPopNext() {
-    print('qqq pop next');
-  }
-
-  @override
-  void didPush() {
-    print('qqq push');
-    // TODO: implement didPush
-  }
-
-  @override
-  void didPushNext() {
-    print('qqq did push next');
-    // TODO: implement didPushNext
-  }
-
-  GetExamProvider _readProvider() {
-    return context.read<GetExamProvider>();
-  }
-
-  GetExamProvider _watchProvider() {
-    return context.watch<GetExamProvider>();
   }
 
   @override
@@ -77,7 +36,7 @@ class _GetExamViewState extends ConsumerState<GetExamView> implements RouteAware
       return const LoadingPage();
     }
     _readProvider().exams.forEach((value) {
-      if ((value.authorID == currentUser.uid) || (value.memberID.contains(currentUser.uid))) {
+      if ((value.authorID == currentUser.uid)) {
         displayExam.add(value);
       }
     });
@@ -88,7 +47,7 @@ class _GetExamViewState extends ConsumerState<GetExamView> implements RouteAware
           : displayExam.isEmpty
               ? Center(
                   child: Text(
-                  'There is no exam for you now!',
+                  'You did not create any exam!',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ))
               : ListView.separated(
@@ -99,9 +58,7 @@ class _GetExamViewState extends ConsumerState<GetExamView> implements RouteAware
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: ExamWidget(
-                        historyIndex: didCompleteExam(displayExam[index].historys, currentUser),
-                        userId: currentUser.uid,
+                      child: ManageExamItem(
                         name: displayExam[index].examName,
                         exam: displayExam[index],
                         text1: ' ${displayExam[index].questions.length} questions',
@@ -113,19 +70,12 @@ class _GetExamViewState extends ConsumerState<GetExamView> implements RouteAware
     );
   }
 
-  @override
-  void dispose() {
-    routeObserver.unsubscribe(this);
-    super.dispose();
+  GetExamProvider _readProvider() {
+    return context.read<GetExamProvider>();
   }
 
-  int didCompleteExam(List<History> hitorys, UserModel currentUser) {
-    for (var history in hitorys) {
-      if (history.memberID == currentUser.uid) {
-        return hitorys.indexOf(history);
-      }
-    }
-    return -1;
+  GetExamProvider _watchProvider() {
+    return context.watch<GetExamProvider>();
   }
 
   String _printDuration(Duration duration) {
@@ -137,21 +87,17 @@ class _GetExamViewState extends ConsumerState<GetExamView> implements RouteAware
   }
 }
 
-class ExamWidget extends StatelessWidget {
+class ManageExamItem extends StatelessWidget {
   final ExamModel exam;
   final String name;
   final String text1;
   final String text2;
-  final String userId;
-  final int historyIndex;
-  const ExamWidget({
+  const ManageExamItem({
     super.key,
     required this.name,
     required this.text1,
     required this.text2,
     required this.exam,
-    required this.userId,
-    required this.historyIndex,
   });
 
   @override
@@ -172,32 +118,13 @@ class ExamWidget extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       tileColor: Colors.grey[900],
       enableFeedback: true,
-      onTap: () async {
-        if (historyIndex != -1) {
-          for (int index = 0; index < quiz.questions.length; index++) {
-            quiz.questions[index].selectedAnswerIndex = exam.historys[historyIndex].listAnswer[index];
-          }
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ScorePage(
-                quiz: quiz,
-                duration: exam.historys[historyIndex].durationTake.inSeconds,
-              ), //ReviewAnswer(quiz: quiz),
-            ),
-          );
-        } else {
-          quiz.questions.forEach((ques) {
-            ques.selectedAnswerIndex = -1;
-          });
-          await Navigator.push(
-            context,
-            ExamDetail.route(quiz, exam, userId),
-          );
-        }
+      onTap: () {
+        // Navigator.push(
+        //   context,
+        //   ExamDetail.route(quiz),
+        // );
       },
-      leading:
-          historyIndex != -1 ? Icon(Icons.assignment_turned_in_outlined, size: 46) : Icon(Icons.assignment, size: 46),
+      leading: Icon(Icons.assignment, size: 46),
       title: Text(
         name,
         style: const TextStyle(

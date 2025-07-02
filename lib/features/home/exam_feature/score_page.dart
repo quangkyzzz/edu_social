@@ -1,37 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:quick_quiz/src/pages/review_answer.dart';
 import 'package:quick_quiz/src/Model/quiz_model.dart';
 import 'package:quick_quiz/src/utils/utils.dart';
 import 'package:quick_quiz/src/widgets/action_button.dart';
 import 'package:quick_quiz/src/widgets/stat_item.dart';
 import 'package:quick_quiz/src/widgets/score_indicator.dart';
+import 'package:social_app/features/home/exam_feature/review_answer.dart';
 
 /// Widget that displays the summary of the quiz
-class Score extends StatefulWidget {
+class ScorePage extends StatefulWidget {
   /// Quiz object containing all information about the quiz
   final Quiz quiz;
-  final Function(List<int> listAns, int durationTake) onFinish;
+  //final Function(List<int> listAns, int durationTake) onFinish;
 
   /// Duration the quiz lasted
   final int duration;
 
   /// Callback function to retry the quiz
-  final VoidCallback onRetry;
+  //final VoidCallback onRetry;
 
   /// Constructor
-  const Score({
+  const ScorePage({
     super.key,
     required this.quiz,
     required this.duration,
-    required this.onRetry,
-    required this.onFinish,
+    //required this.onRetry,
+    //required this.onFinish,
   });
 
   @override
-  State<Score> createState() => _ScoreState();
+  State<ScorePage> createState() => _ScoreState();
 }
 
-class _ScoreState extends State<Score> {
+class _ScoreState extends State<ScorePage> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -171,7 +171,7 @@ class _ScoreState extends State<Score> {
                                   listAns.add(-1);
                                 }
                               }
-                              widget.onFinish.call(listAns, widget.duration);
+                              //widget.onFinish.call(listAns, widget.duration);
                               Navigator.of(context).pop();
                             }),
                       ],

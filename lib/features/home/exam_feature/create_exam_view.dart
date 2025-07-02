@@ -445,13 +445,13 @@ class CreateExamViewState extends ConsumerState<CreateExamView> {
   void _saveExam({required String userID}) async {
     // Process the exam data
     final examName = _examNameController.text;
-    if (selectedStudentIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Your must choose at least one participant')),
-      );
-      return;
-    }
-    ;
+    // if (selectedStudentIds.isEmpty) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(content: Text('Your must choose at least one participant')),
+    //   );
+    //   return;
+    // }
+    // ;
 
     ExamModel exam = ExamModel(
       examName: examName,
@@ -460,11 +460,14 @@ class CreateExamViewState extends ConsumerState<CreateExamView> {
       questions: questions,
       createAt: DateTime.now().millisecondsSinceEpoch,
       duration: Duration(hours: hours, minutes: minutes, seconds: seconds),
+      historys: [],
     );
     if (currentExamId.isEmpty) {
       currentExamId = await ExamApi().addNewExam(exam: exam);
     } else {
-      await ExamApi().updateExam(examId: currentExamId, newData: exam);
+      Map<String, dynamic> newData = exam.toMap();
+      newData.remove('createAt');
+      await ExamApi().updateExam(examId: currentExamId, newData: newData);
     }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Exam saved successfully!')),

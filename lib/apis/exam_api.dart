@@ -18,7 +18,30 @@ class ExamApi {
     return result;
   }
 
-  Future<void> updateExam({required String examId, required ExamModel newData}) async {
-    await FireStoreInstance.db.collection("exam").doc(examId).set(newData.toMap());
+  Future<void> updateExam({required String examId, required Map<String, dynamic> newData}) async {
+    await FireStoreInstance.db.collection("exam").doc(examId).update(newData); //.set(newData.toMap());
+  }
+
+  Future<void> updateExamHistory({
+    required int createAt,
+    required List<int> listAns,
+    required int durationTake,
+    required String userID,
+    required List<History> oldHistory,
+  }) async {
+    var snapShot = await FireStoreInstance.db
+        .collection("exam")
+        .where('createAt', isEqualTo: createAt)
+        .get(); //.doc(examId).set(newData.toMap());
+    var firstDoc = snapShot.docs.firstOrNull;
+    var docId = firstDoc?.id;
+    List<Map<String, dynamic>> newData = [];
+    for (var history in oldHistory) {
+      newData.add(history.toMap());
+    }
+    Map<String, dynamic> newHis =
+        History(memberID: userID, durationTake: Duration(seconds: durationTake), listAnswer: listAns).toMap();
+    newData.add(newHis);
+    await FireStoreInstance.db.collection('exam').doc(docId).update({'historys': newData});
   }
 }

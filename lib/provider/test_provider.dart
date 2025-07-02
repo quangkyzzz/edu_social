@@ -3,7 +3,7 @@ import 'package:quick_quiz/quick_quiz.dart';
 import 'package:social_app/apis/exam_api.dart';
 import 'package:social_app/models/exam_model.dart';
 
-class GetExamProvider extends ChangeNotifier {
+class TestProvider extends ChangeNotifier {
   List<ExamModel> exams = [];
   Quiz? answer;
   bool isLoading = false;

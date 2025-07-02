@@ -3,6 +3,8 @@ import 'package:social_app/core/restart_widget.dart';
 import 'package:social_app/features/meeting/view/video_call_view.dart';
 import 'package:social_app/features/post/view/create_post_view.dart';
 import 'package:social_app/provider/get_exam_provider.dart';
+import 'package:social_app/provider/test_provider.dart';
+import 'package:social_app/route_observer.dart';
 import 'common/common.dart';
 import 'package:social_app/features/auth/controller/auth_controller.dart';
 import 'package:social_app/features/auth/view/login_view.dart';
@@ -40,8 +42,10 @@ class MyApp extends ConsumerWidget {
         ChangeNotifierProvider(
           create: (_) => GetExamProvider(),
         ),
+        ChangeNotifierProvider(create: (_) => TestProvider())
       ],
       child: MaterialApp(
+        navigatorObservers: [routeObserver],
         debugShowCheckedModeBanner: false,
         title: 'Edu Social',
         theme: AppTheme.theme,
