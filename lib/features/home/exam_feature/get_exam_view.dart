@@ -6,7 +6,6 @@ import 'package:quick_quiz/quick_quiz.dart';
 import 'package:social_app/common/common.dart';
 import 'package:social_app/features/auth/controller/auth_controller.dart';
 import 'package:social_app/features/home/exam_feature/exam_detail.dart';
-import 'package:social_app/features/home/exam_feature/review_answer.dart';
 import 'package:social_app/features/home/exam_feature/score_page.dart';
 import 'package:social_app/models/exam_model.dart';
 import 'package:social_app/models/user_model.dart';
