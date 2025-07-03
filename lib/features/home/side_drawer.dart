@@ -1,6 +1,6 @@
 import 'package:social_app/constants/constants.dart';
 import 'package:social_app/features/home/exam_feature/exam_view.dart';
-import 'package:social_app/features/home/group_view.dart';
+import 'package:social_app/features/home/chat_view.dart';
 import 'package:social_app/features/meeting/view/meeting_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -82,13 +82,9 @@ class SideDrawer extends ConsumerWidget {
               },
             ),
             ListTile(
-              leading: Image.asset(
-                AssetsConstants.groupIcon,
-                color: Pallete.whiteColor,
-                width: 30,
-              ),
+              leading: Icon(Icons.forum),
               title: const Text(
-                'Group',
+                'Chat',
                 style: TextStyle(
                   fontSize: 22,
                 ),
@@ -96,7 +92,7 @@ class SideDrawer extends ConsumerWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  GroupView.route(),
+                  ChatPage.route(),
                 );
               },
             ),
