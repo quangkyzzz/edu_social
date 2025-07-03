@@ -1,12 +1,12 @@
-import 'package:appwrite/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quick_quiz/quick_quiz.dart';
 import 'package:social_app/common/UIConstants.dart';
 import 'package:social_app/common/loading_view.dart';
+import 'package:social_app/constants/appwrite_constants.dart';
 import 'package:social_app/features/auth/controller/auth_controller.dart';
 import 'package:social_app/features/explore/controller/explore_controller.dart';
-import 'package:social_app/features/home/exam_feature/score_page.dart';
+import 'package:social_app/features/home/exam_feature/manage_feature/manage_score_page.dart';
 import 'package:social_app/models/exam_model.dart';
 import 'package:social_app/models/user_model.dart';
 import 'package:social_app/theme/pallete.dart';
@@ -34,8 +34,25 @@ class _ManageExamDetailState extends ConsumerState<ManageExamDetail> {
     }
     allFollowing = ref.watch(getFollowingUserProvider(currentUser.following)).value ?? [];
     for (var history in hitorys) {
-      var completedUser = allFollowing.firstWhere((user) => user.uid == history.memberID);
-      participantCompleted.add(completedUser);
+      UserModel completedUser = allFollowing.firstWhere(
+        (user) => user.uid == history.memberID,
+        orElse: () {
+          return UserModel(
+            uid: 'null',
+            email: '',
+            name: '',
+            profilePic: '',
+            bannerPic: '',
+            bio: '',
+            followers: [],
+            following: [],
+            isBlue: false,
+          );
+        },
+      );
+      if (completedUser.uid != 'null') {
+        participantCompleted.add(completedUser);
+      }
     }
     return Scaffold(
       appBar: UIConstants.appBar(),
@@ -54,6 +71,8 @@ class _ManageExamDetailState extends ConsumerState<ManageExamDetail> {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: ManageExamWidget(
+                    durationTake: hitorys[index].durationTake.inSeconds,
+                    listAnswer: hitorys[index].listAnswer,
                     profilePic: participantCompleted[index].profilePic,
                     userId: currentUser.uid,
                     name: participantCompleted[index].name,
@@ -82,7 +101,10 @@ class ManageExamWidget extends StatelessWidget {
   final String name;
   final String text1;
   final String text2;
+  final List<int> listAnswer;
+  final int durationTake;
   final String userId;
+
   const ManageExamWidget({
     super.key,
     required this.name,
@@ -91,6 +113,8 @@ class ManageExamWidget extends StatelessWidget {
     required this.exam,
     required this.userId,
     required this.profilePic,
+    required this.listAnswer,
+    required this.durationTake,
   });
 
   @override
@@ -112,23 +136,21 @@ class ManageExamWidget extends StatelessWidget {
       tileColor: Colors.grey[900],
       enableFeedback: true,
       onTap: () async {
-        if (2 != -1) {
-          // for (int index = 0; index < quiz.questions.length; index++) {
-          //   quiz.questions[index].selectedAnswerIndex = exam.historys[historyIndex].listAnswer[index];
-          // }
-          // await Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => ScorePage(
-          //       quiz: quiz,
-          //       duration: exam.historys[historyIndex].durationTake.inSeconds,
-          //     ), //ReviewAnswer(quiz: quiz),
-          //   ),
-          // );
+        for (int index = 0; index < quiz.questions.length; index++) {
+          quiz.questions[index].selectedAnswerIndex = listAnswer[index];
         }
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ManageScorePage(
+              quiz: quiz,
+              duration: durationTake,
+            ), //ReviewAnswer(quiz: quiz),
+          ),
+        );
       },
       leading: CircleAvatar(
-        backgroundImage: NetworkImage(profilePic),
+        backgroundImage: NetworkImage(AppwriteConstants.imageUrl(profilePic)),
         radius: 20,
       ),
       title: Text(
