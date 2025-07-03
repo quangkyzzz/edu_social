@@ -1,4 +1,5 @@
 import 'package:social_app/common/common.dart';
+import 'package:social_app/constants/appwrite_constants.dart';
 import 'package:social_app/features/auth/controller/auth_controller.dart';
 import 'package:social_app/features/post/controller/post_controller.dart';
 import 'package:social_app/theme/pallete.dart';
@@ -66,7 +67,7 @@ class _CreatePostViewState extends ConsumerState<CreatePostView> {
                     Row(
                       children: [
                         CircleAvatar(
-                          backgroundImage: NetworkImage(currentUser.profilePic),
+                          backgroundImage: NetworkImage(AppwriteConstants.imageUrl(currentUser.profilePic)),
                           radius: 28,
                           backgroundColor: Pallete.whiteColor,
                         ),

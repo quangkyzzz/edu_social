@@ -47,17 +47,15 @@ class _UserProfileState extends ConsumerState<UserProfile> {
                             ? Container(
                                 color: Pallete.blueColor,
                               )
-                            //TODO: fix this
                             : Image.network(
-                                user.bannerPic,
+                                AppwriteConstants.imageUrl(user.bannerPic),
                                 fit: BoxFit.fitWidth,
                               ),
                       ),
                       Positioned(
                         bottom: 0,
                         child: CircleAvatar(
-                          //TODO: fix this
-                          backgroundImage: NetworkImage(user.profilePic),
+                          backgroundImage: NetworkImage(AppwriteConstants.imageUrl(user.profilePic)),
                           radius: 45,
                         ),
                       ),

@@ -5,6 +5,7 @@ import 'package:quick_quiz/quick_quiz.dart';
 import 'package:social_app/common/UIConstants.dart';
 import 'package:social_app/common/loading_view.dart';
 import 'package:social_app/features/auth/controller/auth_controller.dart';
+import 'package:social_app/features/home/exam_feature/manage_feature/manage_exam_detail.dart';
 import 'package:social_app/models/exam_model.dart';
 import 'package:social_app/provider/get_exam_provider.dart';
 import 'package:social_app/theme/pallete.dart';
@@ -119,10 +120,10 @@ class ManageExamItem extends StatelessWidget {
       tileColor: Colors.grey[900],
       enableFeedback: true,
       onTap: () {
-        // Navigator.push(
-        //   context,
-        //   ExamDetail.route(quiz),
-        // );
+        Navigator.push(
+          context,
+          ManageExamDetail.route(exam: exam),
+        );
       },
       leading: Icon(Icons.assignment, size: 46),
       title: Text(

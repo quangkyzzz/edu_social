@@ -1,3 +1,4 @@
+import 'package:social_app/constants/appwrite_constants.dart';
 import 'package:social_app/models/user_model.dart';
 import 'package:jitsi_meet_wrapper/jitsi_meet_wrapper.dart';
 
@@ -26,7 +27,7 @@ class JitsiMethods {
           roomNameOrUrl: roomName,
           userDisplayName: name,
           userEmail: currentUser.email,
-          userAvatarUrl: currentUser.profilePic,
+          userAvatarUrl: AppwriteConstants.imageUrl(currentUser.profilePic),
           isAudioMuted: isAudioMuted,
           isVideoMuted: isVideoMuted);
 

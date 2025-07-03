@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:social_app/apis/exam_api.dart';
 import 'package:social_app/common/loading_view.dart';
+import 'package:social_app/constants/appwrite_constants.dart';
 import 'package:social_app/features/auth/controller/auth_controller.dart';
 import 'package:social_app/features/explore/controller/explore_controller.dart';
 import 'package:social_app/models/exam_model.dart';
@@ -384,7 +385,7 @@ class CreateExamViewState extends ConsumerState<CreateExamView> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   CircleAvatar(
-                                    backgroundImage: NetworkImage(student.profilePic),
+                                    backgroundImage: NetworkImage(AppwriteConstants.imageUrl(student.profilePic)),
                                     radius: 20,
                                   ),
                                   SizedBox(width: 12),

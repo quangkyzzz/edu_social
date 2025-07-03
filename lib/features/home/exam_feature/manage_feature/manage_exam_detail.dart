@@ -1,11 +1,14 @@
+import 'package:appwrite/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quick_quiz/quick_quiz.dart';
 import 'package:social_app/common/UIConstants.dart';
 import 'package:social_app/common/loading_view.dart';
 import 'package:social_app/features/auth/controller/auth_controller.dart';
+import 'package:social_app/features/explore/controller/explore_controller.dart';
 import 'package:social_app/features/home/exam_feature/score_page.dart';
 import 'package:social_app/models/exam_model.dart';
+import 'package:social_app/models/user_model.dart';
 import 'package:social_app/theme/pallete.dart';
 
 class ManageExamDetail extends ConsumerStatefulWidget {
@@ -19,35 +22,44 @@ class ManageExamDetail extends ConsumerStatefulWidget {
 }
 
 class _ManageExamDetailState extends ConsumerState<ManageExamDetail> {
-  List<ExamModel> displayExam = [];
+  List<History> hitorys = [];
+  List<UserModel> participantCompleted = [];
+  List<UserModel> allFollowing = [];
   @override
   Widget build(BuildContext context) {
+    hitorys = widget.exam.historys;
     final currentUser = ref.read(currentUserDetailProvider).value;
     if (currentUser == null) {
       return const LoadingPage();
     }
+    allFollowing = ref.watch(getFollowingUserProvider(currentUser.following)).value ?? [];
+    for (var history in hitorys) {
+      var completedUser = allFollowing.firstWhere((user) => user.uid == history.memberID);
+      participantCompleted.add(completedUser);
+    }
     return Scaffold(
       appBar: UIConstants.appBar(),
-      body: displayExam.isEmpty
+      body: participantCompleted.isEmpty
           ? Center(
               child: Text(
-              'There is no exam for you now!',
+              'No one has completed this exam yet!',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ))
           : ListView.separated(
               separatorBuilder: (context, index) {
                 return const SizedBox(height: 4);
               },
-              itemCount: displayExam.length,
+              itemCount: hitorys.length,
               itemBuilder: (context, index) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: ManageExamWidget(
+                    profilePic: participantCompleted[index].profilePic,
                     userId: currentUser.uid,
-                    name: displayExam[index].examName,
-                    exam: displayExam[index],
-                    text1: ' ${displayExam[index].questions.length} questions',
-                    text2: 'Duration: ${_printDuration(displayExam[index].duration)}',
+                    name: participantCompleted[index].name,
+                    exam: widget.exam,
+                    text1: participantCompleted[index].email,
+                    text2: 'Duration take: ${_printDuration(hitorys[index].durationTake)}',
                   ),
                 );
               },
@@ -66,6 +78,7 @@ class _ManageExamDetailState extends ConsumerState<ManageExamDetail> {
 
 class ManageExamWidget extends StatelessWidget {
   final ExamModel exam;
+  final String profilePic;
   final String name;
   final String text1;
   final String text2;
@@ -77,6 +90,7 @@ class ManageExamWidget extends StatelessWidget {
     required this.text2,
     required this.exam,
     required this.userId,
+    required this.profilePic,
   });
 
   @override
@@ -113,7 +127,10 @@ class ManageExamWidget extends StatelessWidget {
           // );
         }
       },
-      leading: Icon(Icons.assignment, size: 46),
+      leading: CircleAvatar(
+        backgroundImage: NetworkImage(profilePic),
+        radius: 20,
+      ),
       title: Text(
         name,
         style: const TextStyle(

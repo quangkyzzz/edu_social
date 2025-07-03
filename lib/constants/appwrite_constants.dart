@@ -10,5 +10,5 @@ class AppwriteConstants {
   static const String imagesBucket = '65049b71b43a87ba1f7e';
 
   static String imageUrl(String imageId) =>
-      'http://localhost/v1/storage/buckets/$imagesBucket/files/$imageId/view?project=$projectId&mode=admin';
+      'http://192.168.1.40:80/v1/storage/buckets/$imagesBucket/files/$imageId/view?project=$projectId&mode=admin';
 }

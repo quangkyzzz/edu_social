@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:social_app/constants/appwrite_constants.dart';
 import 'package:social_app/core/restart_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +8,7 @@ import 'package:social_app/core/ultils.dart';
 import 'package:social_app/features/auth/controller/auth_controller.dart';
 import 'package:social_app/features/user_profile/controller/user_profile_controller.dart';
 import 'package:social_app/theme/theme.dart';
+import 'package:restart_app/restart_app.dart';
 
 class EditProfileView extends ConsumerStatefulWidget {
   static route() => MaterialPageRoute(
@@ -81,7 +83,9 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
                     bannerFile: bannerFile,
                     profileFile: profileFile,
                   );
-              RestartWidget.restartApp(context);
+
+              Restart.restartApp();
+              //RestartWidget.restartApp(context);
             },
             child: const Text('Save'),
           ),
@@ -113,7 +117,7 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
                                       color: Pallete.blueColor,
                                     )
                                   : Image.network(
-                                      user.bannerPic,
+                                      AppwriteConstants.imageUrl(user.bannerPic),
                                       fit: BoxFit.fitWidth,
                                     ),
                         ),
@@ -129,7 +133,7 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
                                   radius: 40,
                                 )
                               : CircleAvatar(
-                                  backgroundImage: NetworkImage(user.profilePic),
+                                  backgroundImage: NetworkImage(AppwriteConstants.imageUrl(user.profilePic)),
                                   radius: 40,
                                 ),
                         ),

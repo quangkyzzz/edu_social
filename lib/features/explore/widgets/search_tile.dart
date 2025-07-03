@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app/constants/appwrite_constants.dart';
 import 'package:social_app/features/user_profile/view/user_profile_view.dart';
 import 'package:social_app/models/user_model.dart';
 import 'package:social_app/theme/pallete.dart';
@@ -20,7 +21,7 @@ class SearchTile extends StatelessWidget {
         );
       },
       leading: CircleAvatar(
-        backgroundImage: NetworkImage(userModel.profilePic),
+        backgroundImage: NetworkImage(AppwriteConstants.imageUrl(userModel.profilePic)),
         radius: 30,
       ),
       title: Text(

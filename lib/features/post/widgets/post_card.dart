@@ -1,4 +1,5 @@
 import 'package:social_app/common/common.dart';
+import 'package:social_app/constants/appwrite_constants.dart';
 import 'package:social_app/features/post/view/post_reply_view.dart';
 import 'package:social_app/features/user_profile/view/user_profile_view.dart';
 import 'package:flutter_svg/svg.dart';
@@ -56,7 +57,7 @@ class PostCard extends ConsumerWidget {
                                 );
                               },
                               child: CircleAvatar(
-                                backgroundImage: NetworkImage(user.profilePic),
+                                backgroundImage: NetworkImage(AppwriteConstants.imageUrl(user.profilePic)),
                                 radius: 30,
                               ),
                             ),
