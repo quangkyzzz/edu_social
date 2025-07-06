@@ -5,6 +5,7 @@ import 'package:social_app/common/error_page.dart';
 import 'package:social_app/common/loading_view.dart';
 import 'package:social_app/constants/constants.dart';
 import 'package:social_app/features/auth/controller/auth_controller.dart';
+import 'package:social_app/features/home/chat_feature/new_chat/Authenticate/Methods.dart';
 import 'package:social_app/features/post/widgets/post_card.dart';
 import 'package:social_app/features/user_profile/controller/user_profile_controller.dart';
 import 'package:social_app/features/user_profile/view/edit_profile_view.dart';

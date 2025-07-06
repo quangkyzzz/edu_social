@@ -1,6 +1,7 @@
+import 'package:chatview_connect/chatview_connect.dart';
 import 'package:social_app/constants/constants.dart';
 import 'package:social_app/features/home/exam_feature/exam_view.dart';
-import 'package:social_app/features/home/chat_view.dart';
+import 'package:social_app/features/home/chat_feature/chat_view.dart';
 import 'package:social_app/features/meeting/view/meeting_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +19,25 @@ class SideDrawer extends ConsumerWidget {
     if (currentUser == null) {
       return const Loader();
     }
+    print('qqq id: ${currentUser.uid}');
+    ChatViewConnect.initialize(
+      ChatViewCloudService.firebase,
+      chatUserConfig: ChatUserConfig(
+        idKey: currentUser.uid,
+        nameKey: currentUser.name,
+        profilePhotoKey: AppwriteConstants.imageUrl(currentUser.profilePic),
+      ),
 
+      // cloudServiceConfig: FirebaseCloudConfig(
+      //   databasePathConfig: FirestoreChatDatabasePathConfig(
+      //     userCollectionPath: 'organizations/simform',
+      //   ),
+      //   collectionNameConfig: FirestoreChatCollectionNameConfig(
+      //     users: 'app_users',
+      //   ),
+      // ),
+    );
+    ChatViewConnect.instance.setCurrentUserId(currentUser.uid);
     return SafeArea(
       child: Drawer(
         backgroundColor: Pallete.backgroundColor,
@@ -92,7 +111,7 @@ class SideDrawer extends ConsumerWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  ChatPage.route(),
+                  ChatView.route(currentUser),
                 );
               },
             ),

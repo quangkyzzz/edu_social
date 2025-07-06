@@ -3,6 +3,7 @@ import 'package:appwrite/models.dart' as models;
 import 'package:social_app/apis/user_api.dart';
 import 'package:social_app/core/restart_widget.dart';
 import 'package:social_app/core/ultils.dart';
+import 'package:social_app/features/home/chat_feature/new_chat/Authenticate/Methods.dart';
 import 'package:social_app/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod/riverpod.dart';
@@ -78,6 +79,7 @@ class AuthController extends StateNotifier<bool> {
           isBlue: false,
         );
         final res2 = await _userAPI.saveUserData(userModel);
+        createAccount(userModel.name, userModel.email, 'password', userModel.uid);
         res2.fold((l) {
           showSnackBar(context, l.message);
         }, (r) {
