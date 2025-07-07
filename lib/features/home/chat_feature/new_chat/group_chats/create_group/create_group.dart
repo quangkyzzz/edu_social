@@ -44,8 +44,12 @@ class _CreateGroupState extends State<CreateGroup> {
       "message": "${widget.currentUser.name} Created This Group.",
       "type": "notify",
     });
-    //TODO: change this later
-    //Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => HomeScreen()), (route) => false);
+
+    //TODO: test this
+    int count = 0;
+    Navigator.popUntil(context, (route) {
+      return count++ == 2;
+    });
   }
 
   @override

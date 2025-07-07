@@ -1,26 +1,33 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:social_app/constants/appwrite_constants.dart';
+import 'package:social_app/features/explore/controller/explore_controller.dart';
 import 'package:social_app/features/home/chat_feature/new_chat/group_chats/create_group/create_group.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app/models/user_model.dart';
 
-class AddMembersInGroup extends StatefulWidget {
+class AddMembersInGroup extends ConsumerStatefulWidget {
   final UserModel currentUser;
   const AddMembersInGroup({super.key, required this.currentUser});
 
   @override
-  State<AddMembersInGroup> createState() => _AddMembersInGroupState();
+  ConsumerState<AddMembersInGroup> createState() => _AddMembersInGroupState();
 }
 
-class _AddMembersInGroupState extends State<AddMembersInGroup> {
+class _AddMembersInGroupState extends ConsumerState<AddMembersInGroup> {
   final TextEditingController _search = TextEditingController();
-  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<Map<String, dynamic>> membersList = [];
+  List<UserModel> followingUserList = [];
+  List<UserModel> filteredStudents = [];
   bool isLoading = false;
-  Map<String, dynamic>? userMap;
+  Map<String, dynamic> userMap = {};
 
   @override
   void initState() {
     super.initState();
+    followingUserList = ref.read(getFollowingUserProvider(widget.currentUser.following)).value ?? [];
+    filteredStudents = followingUserList;
     getCurrentUserDetails(widget.currentUser.uid);
   }
 
@@ -47,15 +54,14 @@ class _AddMembersInGroupState extends State<AddMembersInGroup> {
         userMap = value.docs[0].data();
         isLoading = false;
       });
-      print(userMap);
     });
   }
 
-  void onResultTap() {
+  void onResultTap(Map newUser) {
     bool isAlreadyExist = false;
 
     for (int i = 0; i < membersList.length; i++) {
-      if (membersList[i]['uid'] == userMap!['uid']) {
+      if (membersList[i]['uid'] == newUser['uid']) {
         isAlreadyExist = true;
       }
     }
@@ -63,13 +69,13 @@ class _AddMembersInGroupState extends State<AddMembersInGroup> {
     if (!isAlreadyExist) {
       setState(() {
         membersList.add({
-          "name": userMap!['name'],
-          "email": userMap!['email'],
-          "uid": userMap!['uid'],
+          "name": newUser['name'],
+          "email": newUser['email'],
+          "uid": newUser['uid'],
           "isAdmin": false,
         });
 
-        userMap = null;
+        // userMap = {};
       });
     }
   }
@@ -145,15 +151,54 @@ class _AddMembersInGroupState extends State<AddMembersInGroup> {
                     onPressed: onSearch,
                     child: Text("Search"),
                   ),
-            userMap != null
-                ? ListTile(
-                    onTap: onResultTap,
-                    leading: Icon(Icons.account_box),
-                    title: Text(userMap!['name']),
-                    subtitle: Text(userMap!['email']),
-                    trailing: Icon(Icons.add),
-                  )
-                : SizedBox(),
+
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: filteredStudents.length,
+              itemBuilder: (context, index) {
+                final student = filteredStudents[index];
+
+                return GestureDetector(
+                  onTap: () {
+                    userMap = {};
+                    userMap.addAll({'uid': student.uid});
+                    userMap.addAll({'status': 'online'});
+                    userMap.addAll({'name': student.name});
+                    userMap.addAll({'email': student.email});
+                    onResultTap(userMap);
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      CircleAvatar(
+                        backgroundImage: NetworkImage(AppwriteConstants.imageUrl(student.profilePic)),
+                        radius: 20,
+                      ),
+                      SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(student.name),
+                          Text(
+                            student.email,
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            // userMap != null
+            //     ? ListTile(
+            //         onTap: onResultTap,
+            //         leading: Icon(Icons.account_box),
+            //         title: Text(userMap!['name']),
+            //         subtitle: Text(userMap!['email']),
+            //         trailing: Icon(Icons.add),
+            //       )
+            //     : SizedBox(),
           ],
         ),
       ),

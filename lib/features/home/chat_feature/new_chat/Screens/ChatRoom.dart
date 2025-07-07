@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -52,12 +54,7 @@ class ChatRoom extends StatelessWidget {
     if (status == 1) {
       String imageUrl = await uploadTask.ref.getDownloadURL();
 
-      await _firestore
-          .collection('chatroom')
-          .doc(chatRoomId)
-          .collection('chats')
-          .doc(fileName)
-          .update({"message": imageUrl});
+      await _firestore.collection('chatroom').doc(chatRoomId).collection('chats').doc(fileName).update({"message": imageUrl});
 
       print(imageUrl);
     }
@@ -93,10 +90,10 @@ class ChatRoom extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(userMap['name']),
-                    Text(
-                      snapshot.data!['status'],
-                      style: TextStyle(fontSize: 14),
-                    ),
+                    // Text(
+                    //   snapshot.data!['status'],
+                    //   style: TextStyle(fontSize: 14),
+                    // ),
                   ],
                 ),
               );
@@ -113,12 +110,8 @@ class ChatRoom extends StatelessWidget {
               height: size.height / 1.25,
               width: size.width,
               child: StreamBuilder<QuerySnapshot>(
-                stream: _firestore
-                    .collection('chatroom')
-                    .doc(chatRoomId)
-                    .collection('chats')
-                    .orderBy("time", descending: false)
-                    .snapshots(),
+                stream:
+                    _firestore.collection('chatroom').doc(chatRoomId).collection('chats').orderBy("time", descending: false).snapshots(),
                 builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.data != null) {
                     return ListView.builder(

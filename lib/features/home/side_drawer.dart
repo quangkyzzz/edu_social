@@ -1,4 +1,3 @@
-import 'package:chatview_connect/chatview_connect.dart';
 import 'package:social_app/constants/constants.dart';
 import 'package:social_app/features/home/exam_feature/exam_view.dart';
 import 'package:social_app/features/home/chat_feature/chat_view.dart';
@@ -20,24 +19,24 @@ class SideDrawer extends ConsumerWidget {
       return const Loader();
     }
     print('qqq id: ${currentUser.uid}');
-    ChatViewConnect.initialize(
-      ChatViewCloudService.firebase,
-      chatUserConfig: ChatUserConfig(
-        idKey: currentUser.uid,
-        nameKey: currentUser.name,
-        profilePhotoKey: AppwriteConstants.imageUrl(currentUser.profilePic),
-      ),
+    // ChatViewConnect.initialize(
+    //   ChatViewCloudService.firebase,
+    //   chatUserConfig: ChatUserConfig(
+    //     idKey: currentUser.uid,
+    //     nameKey: currentUser.name,
+    //     profilePhotoKey: AppwriteConstants.imageUrl(currentUser.profilePic),
+    //   ),
 
-      // cloudServiceConfig: FirebaseCloudConfig(
-      //   databasePathConfig: FirestoreChatDatabasePathConfig(
-      //     userCollectionPath: 'organizations/simform',
-      //   ),
-      //   collectionNameConfig: FirestoreChatCollectionNameConfig(
-      //     users: 'app_users',
-      //   ),
-      // ),
-    );
-    ChatViewConnect.instance.setCurrentUserId(currentUser.uid);
+    //   // cloudServiceConfig: FirebaseCloudConfig(
+    //   //   databasePathConfig: FirestoreChatDatabasePathConfig(
+    //   //     userCollectionPath: 'organizations/simform',
+    //   //   ),
+    //   //   collectionNameConfig: FirestoreChatCollectionNameConfig(
+    //   //     users: 'app_users',
+    //   //   ),
+    //   // ),
+    // );
+    // ChatViewConnect.instance.setCurrentUserId(currentUser.uid);
     return SafeArea(
       child: Drawer(
         backgroundColor: Pallete.backgroundColor,

@@ -99,14 +99,14 @@ class _GroupInfoState extends State<GroupInfo> {
         "members": membersList,
       });
 
-      await _firestore
-          .collection('users')
-          .doc(widget.currentUser.uid)
-          .collection('groups')
-          .doc(widget.groupId)
-          .delete();
+      await _firestore.collection('users').doc(widget.currentUser.uid).collection('groups').doc(widget.groupId).delete();
 
-      //TODO: change this later
+      //TODO: test this
+      int count = 0;
+      Navigator.popUntil(context, (route) {
+        return count++ == 2;
+      });
+
       // Navigator.of(context).pushAndRemoveUntil(
       //   MaterialPageRoute(builder: (_) => HomeScreen()),
       //   (route) => false,
@@ -200,6 +200,7 @@ class _GroupInfoState extends State<GroupInfo> {
                             onTap: () => Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (_) => AddMembersINGroup(
+                                  currentUser: widget.currentUser,
                                   groupChatId: widget.groupId,
                                   name: widget.groupName,
                                   membersList: membersList,
