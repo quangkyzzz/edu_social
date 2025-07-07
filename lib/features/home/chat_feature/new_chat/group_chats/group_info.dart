@@ -1,11 +1,13 @@
-import 'package:social_app/features/home/chat_feature/new_chat/Screens/ChatPage.dart';
+// ignore_for_file: prefer_final_fields
 import 'package:social_app/features/home/chat_feature/new_chat/group_chats/add_members.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app/models/user_model.dart';
 
 class GroupInfo extends StatefulWidget {
+  final UserModel currentUser;
   final String groupId, groupName;
-  const GroupInfo({required this.groupId, required this.groupName, Key? key}) : super(key: key);
+  const GroupInfo({required this.groupId, required this.groupName, super.key, required this.currentUser});
 
   @override
   State<GroupInfo> createState() => _GroupInfoState();
@@ -37,8 +39,7 @@ class _GroupInfoState extends State<GroupInfo> {
     bool isAdmin = false;
 
     membersList.forEach((element) {
-      if (element['uid'] == '_auth.currentUser!.uid') {
-        //TODO: change this
+      if (element['uid'] == widget.currentUser.uid) {
         isAdmin = element['isAdmin'];
       }
     });
@@ -89,8 +90,7 @@ class _GroupInfoState extends State<GroupInfo> {
       });
 
       for (int i = 0; i < membersList.length; i++) {
-        if (membersList[i]['uid'] == '_auth.currentUser!.uid') {
-          //TODO: change this
+        if (membersList[i]['uid'] == widget.currentUser.uid) {
           membersList.removeAt(i);
         }
       }
@@ -101,10 +101,10 @@ class _GroupInfoState extends State<GroupInfo> {
 
       await _firestore
           .collection('users')
-          .doc('_auth.currentUser!.uid')
+          .doc(widget.currentUser.uid)
           .collection('groups')
           .doc(widget.groupId)
-          .delete(); //TODO: change this
+          .delete();
 
       //TODO: change this later
       // Navigator.of(context).pushAndRemoveUntil(

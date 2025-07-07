@@ -1,24 +1,27 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, no_leading_underscores_for_local_identifiers
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:social_app/features/explore/controller/explore_controller.dart';
 
 import 'package:social_app/features/home/chat_feature/new_chat/Screens/ChatRoom.dart';
 import 'package:social_app/features/home/chat_feature/new_chat/group_chats/group_chat_screen.dart';
 import 'package:social_app/models/user_model.dart';
 
-class ChatPage extends StatefulWidget {
+class ChatPage extends ConsumerStatefulWidget {
   final UserModel currentUser;
   const ChatPage({
     super.key,
     required this.currentUser,
   });
   @override
-  _ChatPageState createState() => _ChatPageState();
+  ConsumerState createState() => CreateChatPageState();
 }
 
-class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
+class CreateChatPageState extends ConsumerState<ChatPage> with WidgetsBindingObserver {
   Map<String, dynamic>? userMap;
   bool isLoading = false;
+  List<UserModel> followingUserList = [];
   final TextEditingController _search = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -26,6 +29,9 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    followingUserList = ref.read(getFollowingUserProvider(widget.currentUser.following)).value ?? [];
+    userMap;
+    //TODO: continue from here
     // setStatus("Online");
   }
 
@@ -131,6 +137,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (_) => ChatRoom(
+                                currentUser: widget.currentUser,
                                 chatRoomId: roomId,
                                 userMap: userMap!,
                               ),
@@ -156,7 +163,9 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
         child: Icon(Icons.group),
         onPressed: () => Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => GroupChatHomeScreen(),
+            builder: (_) => GroupChatHomeScreen(
+              currentUser: widget.currentUser,
+            ),
           ),
         ),
       ),

@@ -4,13 +4,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:social_app/models/user_model.dart';
 import 'package:uuid/uuid.dart';
 
 class ChatRoom extends StatelessWidget {
+  final UserModel currentUser;
   final Map<String, dynamic> userMap;
   final String chatRoomId;
 
-  ChatRoom({required this.chatRoomId, required this.userMap});
+  ChatRoom({required this.chatRoomId, required this.userMap, required this.currentUser});
 
   final TextEditingController _message = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -33,7 +35,7 @@ class ChatRoom extends StatelessWidget {
     int status = 1;
 
     await _firestore.collection('chatroom').doc(chatRoomId).collection('chats').doc(fileName).set({
-      "sendby": 'usersend', //TODO: change this
+      "sendby": currentUser.name,
       "message": "",
       "type": "img",
       "time": FieldValue.serverTimestamp(),
@@ -50,7 +52,12 @@ class ChatRoom extends StatelessWidget {
     if (status == 1) {
       String imageUrl = await uploadTask.ref.getDownloadURL();
 
-      await _firestore.collection('chatroom').doc(chatRoomId).collection('chats').doc(fileName).update({"message": imageUrl});
+      await _firestore
+          .collection('chatroom')
+          .doc(chatRoomId)
+          .collection('chats')
+          .doc(fileName)
+          .update({"message": imageUrl});
 
       print(imageUrl);
     }
@@ -59,7 +66,7 @@ class ChatRoom extends StatelessWidget {
   void onSendMessage() async {
     if (_message.text.isNotEmpty) {
       Map<String, dynamic> messages = {
-        "sendby": 'userSend', //TODO: change this
+        "sendby": currentUser.name,
         "message": _message.text,
         "type": "text",
         "time": FieldValue.serverTimestamp(),
@@ -106,8 +113,12 @@ class ChatRoom extends StatelessWidget {
               height: size.height / 1.25,
               width: size.width,
               child: StreamBuilder<QuerySnapshot>(
-                stream:
-                    _firestore.collection('chatroom').doc(chatRoomId).collection('chats').orderBy("time", descending: false).snapshots(),
+                stream: _firestore
+                    .collection('chatroom')
+                    .doc(chatRoomId)
+                    .collection('chats')
+                    .orderBy("time", descending: false)
+                    .snapshots(),
                 builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.data != null) {
                     return ListView.builder(
@@ -164,7 +175,7 @@ class ChatRoom extends StatelessWidget {
     return map['type'] == "text"
         ? Container(
             width: size.width,
-            alignment: map['sendby'] == 'currentUser' ? Alignment.centerRight : Alignment.centerLeft, //TODO: change this
+            alignment: map['sendby'] == currentUser.name ? Alignment.centerRight : Alignment.centerLeft,
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
               margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
@@ -186,7 +197,7 @@ class ChatRoom extends StatelessWidget {
             height: size.height / 2.5,
             width: size.width,
             padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-            alignment: map['sendby'] == 'currentUser' ? Alignment.centerRight : Alignment.centerLeft, //TODO: change this
+            alignment: map['sendby'] == currentUser.name ? Alignment.centerRight : Alignment.centerLeft,
             child: InkWell(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(

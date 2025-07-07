@@ -2,9 +2,11 @@ import 'package:social_app/features/home/chat_feature/new_chat/group_chats/creat
 import 'package:social_app/features/home/chat_feature/new_chat/group_chats/group_chat_room.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app/models/user_model.dart';
 
 class GroupChatHomeScreen extends StatefulWidget {
-  const GroupChatHomeScreen({Key? key}) : super(key: key);
+  final UserModel currentUser;
+  const GroupChatHomeScreen({super.key, required this.currentUser});
 
   @override
   _GroupChatHomeScreenState createState() => _GroupChatHomeScreenState();
@@ -23,7 +25,7 @@ class _GroupChatHomeScreenState extends State<GroupChatHomeScreen> {
   }
 
   void getAvailableGroups() async {
-    String uid = '_auth.currentUser!.uid'; //TODO Change this
+    String uid = widget.currentUser.uid;
 
     await _firestore.collection('users').doc(uid).collection('groups').get().then((value) {
       setState(() {
@@ -55,6 +57,7 @@ class _GroupChatHomeScreenState extends State<GroupChatHomeScreen> {
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => GroupChatRoom(
+                        currentUser: widget.currentUser,
                         groupName: groupList[index]['name'],
                         groupChatId: groupList[index]['id'],
                       ),
@@ -69,7 +72,9 @@ class _GroupChatHomeScreenState extends State<GroupChatHomeScreen> {
         child: Icon(Icons.create),
         onPressed: () => Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => AddMembersInGroup(),
+            builder: (_) => AddMembersInGroup(
+              currentUser: widget.currentUser,
+            ),
           ),
         ),
         tooltip: "Create Group",

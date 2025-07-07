@@ -1,9 +1,11 @@
 import 'package:social_app/features/home/chat_feature/new_chat/group_chats/create_group/create_group.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app/models/user_model.dart';
 
 class AddMembersInGroup extends StatefulWidget {
-  const AddMembersInGroup({Key? key}) : super(key: key);
+  final UserModel currentUser;
+  const AddMembersInGroup({super.key, required this.currentUser});
 
   @override
   State<AddMembersInGroup> createState() => _AddMembersInGroupState();
@@ -19,12 +21,11 @@ class _AddMembersInGroupState extends State<AddMembersInGroup> {
   @override
   void initState() {
     super.initState();
-    getCurrentUserDetails();
+    getCurrentUserDetails(widget.currentUser.uid);
   }
 
-  void getCurrentUserDetails() async {
-    await _firestore.collection('users').doc('currentUserId').get().then((map) {
-      //TODO: change this
+  void getCurrentUserDetails(String userID) async {
+    await _firestore.collection('users').doc(userID).get().then((map) {
       setState(() {
         membersList.add({
           "name": map['name'],
@@ -74,8 +75,7 @@ class _AddMembersInGroupState extends State<AddMembersInGroup> {
   }
 
   void onRemoveMembers(int index) {
-    if (membersList[index]['uid'] != 'currentUserId') {
-      //TODO: change this
+    if (membersList[index]['uid'] != widget.currentUser.uid) {
       setState(() {
         membersList.removeAt(index);
       });
@@ -163,6 +163,7 @@ class _AddMembersInGroupState extends State<AddMembersInGroup> {
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => CreateGroup(
+                    currentUser: widget.currentUser,
                     membersList: membersList,
                   ),
                 ),

@@ -1,12 +1,14 @@
 import 'package:social_app/features/home/chat_feature/new_chat/Screens/ChatPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app/models/user_model.dart';
 import 'package:uuid/uuid.dart';
 
 class CreateGroup extends StatefulWidget {
+  final UserModel currentUser;
   final List<Map<String, dynamic>> membersList;
 
-  const CreateGroup({required this.membersList, Key? key}) : super(key: key);
+  const CreateGroup({required this.membersList, super.key, required this.currentUser});
 
   @override
   State<CreateGroup> createState() => _CreateGroupState();
@@ -39,7 +41,7 @@ class _CreateGroupState extends State<CreateGroup> {
     }
 
     await _firestore.collection('groups').doc(groupId).collection('chats').add({
-      "message": "${'currentUserName'} Created This Group.", //TODO: change this
+      "message": "${widget.currentUser.name} Created This Group.",
       "type": "notify",
     });
     //TODO: change this later
@@ -96,6 +98,3 @@ class _CreateGroupState extends State<CreateGroup> {
     );
   }
 }
-
-
-//

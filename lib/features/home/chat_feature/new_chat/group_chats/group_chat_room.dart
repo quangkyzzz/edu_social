@@ -1,11 +1,13 @@
 import 'package:social_app/features/home/chat_feature/new_chat/group_chats/group_info.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app/models/user_model.dart';
 
 class GroupChatRoom extends StatelessWidget {
+  final UserModel currentUser;
   final String groupChatId, groupName;
 
-  GroupChatRoom({required this.groupName, required this.groupChatId, Key? key}) : super(key: key);
+  GroupChatRoom({required this.groupName, required this.groupChatId, super.key, required this.currentUser});
 
   final TextEditingController _message = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -37,6 +39,7 @@ class GroupChatRoom extends StatelessWidget {
               onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => GroupInfo(
+                        currentUser: currentUser,
                         groupName: groupName,
                         groupId: groupChatId,
                       ),
@@ -52,7 +55,8 @@ class GroupChatRoom extends StatelessWidget {
               height: size.height / 1.27,
               width: size.width,
               child: StreamBuilder<QuerySnapshot>(
-                stream: _firestore.collection('groups').doc(groupChatId).collection('chats').orderBy('time').snapshots(),
+                stream:
+                    _firestore.collection('groups').doc(groupChatId).collection('chats').orderBy('time').snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ListView.builder(
@@ -111,7 +115,7 @@ class GroupChatRoom extends StatelessWidget {
       if (chatMap['type'] == "text") {
         return Container(
           width: size.width,
-          alignment: chatMap['sendBy'] == 'userSendName' ? Alignment.centerRight : Alignment.centerLeft, //TODO: change this
+          alignment: chatMap['sendBy'] == currentUser.name ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
               padding: EdgeInsets.symmetric(vertical: 8, horizontal: 14),
               margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
@@ -146,8 +150,7 @@ class GroupChatRoom extends StatelessWidget {
       } else if (chatMap['type'] == "img") {
         return Container(
           width: size.width,
-          alignment:
-              chatMap['sendBy'] == '_auth.currentUser!.displayName' ? Alignment.centerRight : Alignment.centerLeft, //TODO: change this
+          alignment: chatMap['sendBy'] == currentUser.name ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
             margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
